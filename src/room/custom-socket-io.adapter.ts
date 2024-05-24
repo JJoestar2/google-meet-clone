@@ -11,7 +11,7 @@ export class CustomSocketIoAdapter extends IoAdapter {
         super(app);
     }
 
-    createIoServer(port: number, options?: ServerOptions): any {
+    createIOServer(port: number, options?: ServerOptions): any {
         const origin = this.configService.get("WEB_URL") || "*";
         const opts = { ...options, cors: { origin } };
         

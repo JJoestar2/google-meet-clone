@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -7,12 +7,32 @@ import {
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer
+  WebSocketServer,
+  WsException
 } from '@nestjs/websockets';
 import { Server, Socket } from "socket.io";
 
 export interface AuthSocket extends Socket {}
 
+@UsePipes(
+  new ValidationPipe({
+    whitelist: true,
+    exceptionFactory: (validationErrors) => {
+      const result = validationErrors.map((error) => ({
+        property: error.property,
+        message: error.constraints
+          ? error.constraints[Object.keys(error.constraints)[0]]
+          : "Bad Request",
+      }));
+
+      return new WsException({
+        status: 400,
+        errors: result,
+        error: "Bad Request",
+      });
+    },
+  })
+)
 @WebSocketGateway({ namespace: "room" })
 export class RoomGateway
 implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -35,6 +55,15 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('message')
   handleMessage(
+    @ConnectedSocket() client: AuthSocket,
+    @MessageBody() payload: any
+  ): string {
+    console.log(`${client.id} send a ${payload}`);
+    return 'Hello world!';
+  }
+
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(
     @ConnectedSocket() client: AuthSocket,
     @MessageBody() payload: any
   ): string {
