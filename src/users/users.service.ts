@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ProjectionType } from 'mongoose';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -11,22 +11,31 @@ export class UsersService {
 
   constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  create(user: Partial<User>): Promise<User> {
+    const newUserDocument = new this.userModel(user);
+
+    return newUserDocument.save();
   }
 
-  findAll() {
+  findAll(): Promise<User[]> {
     return this.userModel
     .find()
     .lean();
   }
 
-  findOne(email: string) {
-    const user = this.userModel
-    .findOne({ email })
-    .lean();
+  getByEmail(email: string): Promise<User> {
+    return this.userModel.findOne({ email }).lean();
+  }
 
-    if (!user) throw new NotFoundException(`User with email ${email} not found`);
+  async getById(
+    userId: string,
+    projection: ProjectionType<User> | null = null,
+    lean: boolean = true
+  ): Promise<User> {
+    const user = await this.userModel.findById(userId, projection).lean(lean);
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
 
     return user;
   }
@@ -41,5 +50,7 @@ export class UsersService {
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
 
     this.userModel.deleteOne({ id });
+
+    return user;
   }
 }
