@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, Length } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class AuthPayloadDto {
     @IsNotEmpty()
@@ -8,4 +8,7 @@ export class AuthPayloadDto {
     email: string;
     @IsNotEmpty()
     password: string;
+    @IsString()
+    @IsOptional()
+    avatar?: string;
 }
