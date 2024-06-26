@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
-import { Document } from "mongoose";
+import { Document, now } from "mongoose";
 import { AbstractDocument } from "src/database/abstract.schema";
 
 export type UserDocument = User & Document;
@@ -29,6 +29,9 @@ export class User extends AbstractDocument {
         required: false,
     })
     avatar: string;
+
+    @Prop({ default: now, type: Date })
+    lastActivity: Date;
 
     // TODO add rooms array 
 }
