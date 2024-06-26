@@ -22,10 +22,16 @@ export class AuthService {
         if (!user) return null;
         if (!isPasswordMatched) throw new UnauthorizedException();
 
-        const payload = { sub: user._id, username: user.name };
+        const payload = {
+            sub: user._id,
+            username: user.name,
+            email: user.email,
+            avatar: user.avatar,
+        };
 
         return {
-            accessToken: await this.jwtService.signAsync(payload)
+            accessToken: await this.jwtService.signAsync(payload),
+            user
         }
     }
 
@@ -36,7 +42,12 @@ export class AuthService {
             password: hashedPassword,
         });
 
-        const payload = { sub: user._id, username: user.name };
+        const payload = {
+            sub: user._id,
+            username: user.name,
+            email: user.email,
+            avatar: user.avatar,
+        };
 
         return {
             accessToken: await this.jwtService.signAsync(payload),

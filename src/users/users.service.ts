@@ -53,4 +53,20 @@ export class UsersService {
 
     return user;
   }
+
+  async getByEmailAndUpdateActivity(email: string) {
+    const user = await this.userModel.findOne({ email });
+
+    if (!user) return null;
+
+    const lastVisitedToday =
+      user.lastActivity.toDateString() === new Date().toDateString();
+
+    if (lastVisitedToday) return user.toObject();
+
+    user.lastActivity = new Date();
+    await user.save();
+
+    return user.toObject();
+  }
 }

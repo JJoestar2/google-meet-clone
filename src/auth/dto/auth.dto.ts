@@ -10,5 +10,5 @@ export class AuthPayloadDto {
   
     @IsBoolean()
     @IsOptional()
-    rememberMe: boolean;
+    rememberMe?: boolean;
 }
