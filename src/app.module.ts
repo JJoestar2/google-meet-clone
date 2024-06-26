@@ -21,6 +21,7 @@ import { DatabaseModule } from './database/database.module';
         PORT: Joi.number().required(),
         WEB_URL: Joi.string().required(),
         MONGODB_URI: Joi.string().required(),
+        MONGODB_DB_NAME: Joi.string().required(),
       }),
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI),
